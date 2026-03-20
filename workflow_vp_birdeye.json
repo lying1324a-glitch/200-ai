@@ -1,0 +1,241 @@
+{
+  "last_node_id": 12,
+  "last_link_id": 12,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [60, 120],
+      "size": [320, 320],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [1], "slot_index": 0},
+        {"name": "MASK", "type": "MASK", "links": null, "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "LoadImage"},
+      "widgets_values": ["example.jpg", "image"]
+    },
+    {
+      "id": 2,
+      "type": "ImagePreprocessNode",
+      "pos": [430, 120],
+      "size": [380, 220],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 1}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [2, 11], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "ImagePreprocessNode"},
+      "widgets_values": [false, "[[1000,0,512],[0,1000,512],[0,0,1]]", "[0,0,0,0,0]", false]
+    },
+    {
+      "id": 3,
+      "type": "LineDetectionNode",
+      "pos": [860, 120],
+      "size": [380, 260],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 2}
+      ],
+      "outputs": [
+        {"name": "lines", "type": "VW_LINES", "links": [3], "slot_index": 0},
+        {"name": "preview", "type": "IMAGE", "links": [12], "slot_index": 1},
+        {"name": "line_count", "type": "INT", "links": null, "slot_index": 2}
+      ],
+      "properties": {"Node name for S&R": "LineDetectionNode"},
+      "widgets_values": ["lsd", 80, 50, 10]
+    },
+    {
+      "id": 4,
+      "type": "LineClusteringNode",
+      "pos": [1290, 120],
+      "size": [360, 180],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {"name": "lines", "type": "VW_LINES", "link": 3}
+      ],
+      "outputs": [
+        {"name": "clusters", "type": "VW_CLUSTERS", "links": [4], "slot_index": 0},
+        {"name": "cluster_debug_json", "type": "STRING", "links": null, "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "LineClusteringNode"},
+      "widgets_values": [15.0]
+    },
+    {
+      "id": 5,
+      "type": "VanishingPointDetectionNode",
+      "pos": [1710, 120],
+      "size": [360, 160],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {"name": "clusters", "type": "VW_CLUSTERS", "link": 4}
+      ],
+      "outputs": [
+        {"name": "vanishing_points", "type": "VW_VPS", "links": [5, 7], "slot_index": 0},
+        {"name": "vp_debug_json", "type": "STRING", "links": null, "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "VanishingPointDetectionNode"},
+      "widgets_values": []
+    },
+    {
+      "id": 6,
+      "type": "FocalLengthEstimationNode",
+      "pos": [2140, 120],
+      "size": [420, 180],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "vanishing_points", "type": "VW_VPS", "link": 5},
+        {"name": "image", "type": "IMAGE", "link": 11}
+      ],
+      "outputs": [
+        {"name": "intrinsics", "type": "VW_INTRINSICS", "links": [6, 8], "slot_index": 0},
+        {"name": "focal_length", "type": "FLOAT", "links": null, "slot_index": 1},
+        {"name": "intrinsics_debug_json", "type": "STRING", "links": null, "slot_index": 2}
+      ],
+      "properties": {"Node name for S&R": "FocalLengthEstimationNode"},
+      "widgets_values": []
+    },
+    {
+      "id": 7,
+      "type": "CameraPoseRecoveryNode",
+      "pos": [2600, 120],
+      "size": [380, 160],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {"name": "vanishing_points", "type": "VW_VPS", "link": 7},
+        {"name": "intrinsics", "type": "VW_INTRINSICS", "link": 6}
+      ],
+      "outputs": [
+        {"name": "pose", "type": "VW_POSE", "links": [9], "slot_index": 0},
+        {"name": "pose_debug_json", "type": "STRING", "links": null, "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "CameraPoseRecoveryNode"},
+      "widgets_values": []
+    },
+    {
+      "id": 8,
+      "type": "GroundHomographyNode",
+      "pos": [3020, 120],
+      "size": [420, 180],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {"name": "pose", "type": "VW_POSE", "link": 9},
+        {"name": "intrinsics", "type": "VW_INTRINSICS", "link": 8}
+      ],
+      "outputs": [
+        {"name": "homography", "type": "VW_H", "links": [10], "slot_index": 0},
+        {"name": "homography_debug_json", "type": "STRING", "links": null, "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "GroundHomographyNode"},
+      "widgets_values": [0.0]
+    },
+    {
+      "id": 9,
+      "type": "BirdEyeViewNode",
+      "pos": [3470, 120],
+      "size": [400, 180],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 12},
+        {"name": "homography", "type": "VW_H", "link": 10}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [13], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "BirdEyeViewNode"},
+      "widgets_values": [1024, 1024]
+    },
+    {
+      "id": 10,
+      "type": "PreviewImage",
+      "pos": [3920, 120],
+      "size": [320, 300],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 13}
+      ],
+      "outputs": [],
+      "properties": {"Node name for S&R": "PreviewImage"},
+      "widgets_values": []
+    },
+    {
+      "id": 11,
+      "type": "PreviewImage",
+      "pos": [1280, 420],
+      "size": [320, 300],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 14}
+      ],
+      "outputs": [],
+      "properties": {"Node name for S&R": "PreviewImage"},
+      "widgets_values": []
+    },
+    {
+      "id": 12,
+      "type": "SizeMeasurementNode",
+      "pos": [3470, 370],
+      "size": [420, 220],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "distance_m", "type": "FLOAT", "links": null, "slot_index": 0},
+        {"name": "measurement_debug", "type": "STRING", "links": null, "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "SizeMeasurementNode"},
+      "widgets_values": [100.0, 100.0, 300.0, 100.0, 0.005]
+    }
+  ],
+  "links": [
+    [1, 1, 0, 2, 0, "IMAGE"],
+    [2, 2, 0, 3, 0, "IMAGE"],
+    [3, 3, 0, 4, 0, "VW_LINES"],
+    [4, 4, 0, 5, 0, "VW_CLUSTERS"],
+    [5, 5, 0, 6, 0, "VW_VPS"],
+    [6, 6, 0, 7, 1, "VW_INTRINSICS"],
+    [7, 5, 0, 7, 0, "VW_VPS"],
+    [8, 6, 0, 8, 1, "VW_INTRINSICS"],
+    [9, 7, 0, 8, 0, "VW_POSE"],
+    [10, 8, 0, 9, 1, "VW_H"],
+    [11, 2, 0, 6, 1, "IMAGE"],
+    [12, 2, 0, 9, 0, "IMAGE"],
+    [13, 9, 0, 10, 0, "IMAGE"],
+    [14, 3, 1, 11, 0, "IMAGE"]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.65,
+      "offset": [-10, 20]
+    }
+  },
+  "version": 0.4
+}
