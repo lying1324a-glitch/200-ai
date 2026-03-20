@@ -40,3 +40,15 @@
 - `LineClusteringNode` 的聚类角度
 - `GroundHomographyNode` 的 `plane_height`
 - `SizeMeasurementNode` 的两点坐标与 `meters_per_pixel`
+
+## 常见告警说明（ComfyUI Manager / legacy API）
+如果启动日志出现：
+- `FETCH DATA ... comfyui_manager/custom-node-list.json [DONE]`
+- `[DEPRECATION WARNING] Detected import of deprecated legacy API: /scripts/ui.js`
+
+含义如下：
+- 第一条是 **ComfyUI-Manager 拉取节点列表**，属于正常信息，不是错误。
+- 第二条通常来自 **其他自定义节点扩展** 使用了旧版前端 API。
+
+本仓库当前仅包含 Python 节点（`nodes.py` / `__init__.py`），不包含任何 `web` 前端脚本，也没有 `scripts/ui.js` 相关导入。
+若要消除该告警，请逐个禁用或更新其他扩展后重启 ComfyUI 定位来源。
