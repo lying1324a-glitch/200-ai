@@ -1,19 +1,25 @@
 import json
 import math
-from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import cv2
 import numpy as np
+import torch
 
 
 class WorkflowNodeError(RuntimeError):
     """Error with actionable details for workflow tuning."""
 
 
-def _to_numpy_rgb(image: np.ndarray) -> np.ndarray:
-    if not isinstance(image, np.ndarray):
-        raise WorkflowNodeError(f"Expected numpy.ndarray image, got: {type(image)}")
+def _to_numpy_rgb(image) -> np.ndarray:
+    # ComfyUI IMAGE is usually torch.Tensor [B,H,W,C], but some integrations may pass numpy arrays.
+    if isinstance(image, torch.Tensor):
+        image = image.detach().cpu().numpy()
+    elif not isinstance(image, np.ndarray):
+        raise WorkflowNodeError(
+            f"Expected IMAGE as torch.Tensor or numpy.ndarray, got: {type(image)}"
+        )
+
     if image.ndim != 4:
         raise WorkflowNodeError(
             f"Expected ComfyUI image shape [B,H,W,C], got: {image.shape}. "
@@ -29,11 +35,12 @@ def _to_numpy_rgb(image: np.ndarray) -> np.ndarray:
     return arr
 
 
-def _to_comfy_image(image: np.ndarray) -> np.ndarray:
+def _to_comfy_image(image: np.ndarray) -> torch.Tensor:
     if image.ndim != 3 or image.shape[-1] != 3:
         raise WorkflowNodeError(f"Expected HWC RGB uint8 image, got {image.shape}")
     out = image.astype(np.float32) / 255.0
-    return np.expand_dims(out, axis=0)
+    out = np.expand_dims(out, axis=0)
+    return torch.from_numpy(out)
 
 
 def _normalize(v: np.ndarray, eps: float = 1e-8) -> np.ndarray:
