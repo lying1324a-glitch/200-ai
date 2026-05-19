@@ -56,3 +56,8 @@
 - 重启 ComfyUI 后再观察
 
 本仓库未提供任何前端 `.js` 扩展文件；若仍出现该警告，通常是历史版本残留文件被加载。
+
+
+> 兼容性修复：节点加载时会自动扫描本目录下的 `.js` 文件；若检测到旧 API 导入
+> （如 `/scripts/ui.js`、`/extensions/core/widgetInputs.js`、`/scripts/ui/components/buttonGroup.js`、`/scripts/ui/components/button.js`），
+> 会自动重命名为 `*.legacy.disabled` 以阻止 ComfyUI 继续加载该旧脚本。
